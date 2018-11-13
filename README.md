@@ -5,10 +5,10 @@ In this project, students will explore RESTful web service design by implementin
 Read the full project description in ProjectDescription.pdf
 
 
-### For Instructor
+### For Instructors
 The latex version for the project writeup is included within the latex folder if you wish to modify it for your particular class. 
 
-This Project can be utilized to  explore the following topics: 
+This project can be utilized to  explore the following topics: 
 - Concepts: HTTP, REST, APIs, JSON
 - Languages: Java, Python, Javascript
 - Frameworks: Spring, Node.js, Express, Flask, Django 
