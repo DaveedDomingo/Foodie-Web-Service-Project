@@ -1,4 +1,4 @@
-# The Foodie Wed Service
+# The Foodie Wed Service Project
 
 In this project, students will explore RESTful web service design by implementing a webservice that will return a list of neaby resturaunts given a address. 
 
