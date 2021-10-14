@@ -101,29 +101,30 @@ The most popular way to serialize and pass data within HTTP requests is with JSO
 %	Architecture and Flow
 %----------------------------------------------------------------------------------------
 \section*{The Foodie WebService}
-Your task is to build the back-end of our Foodie Web Service. We want the web service to take a HTTP request with an address parameter and respond with a list popular restaurants nearby. How will we do this? Fortunately we have two APIs that we can use to do just that. Geocod.io is a Geocoding web service that can take an address and turn it into a geographic description (e.g. latitude and longitude). Zomato is a web service that provides restaurant content and has a REST endpoint that can find a nearby restaurants given latitude and longitude as input. We'll use both of these services we can create our Foodie Web Service.
+Your task is to build the back-end of our Foodie Web Service. We want the web service to take a HTTP request with an address parameter and respond with a list popular restaurants nearby. How will we do this? Fortunately we have two APIs that we can use to do just that. Geocod.io is a Geocoding web service that can take an address and turn it into a geographic description (e.g. latitude and longitude). Yelp is a web service that provides an API to search nearby businesses given a search category and latitude and longitude as input. We'll use both of these services we can create our Foodie Web Service.
 
 \begin{figure}[h!]
  \centering
  \includegraphics[width=60mm]{images/geocodio}
- \includegraphics[width=60mm]{images/Zomato}
+ \hspace{1cm}
+ \includegraphics[width=45mm]{images/YelpLogo}
 \end{figure} 
 
 \section*{Architecture and Flow}
-In figure 1 you can see the main architecture of our web service. Our web service will consist of three systems: (1) our foodie web service that will handle requests, (2) the Geocod.io web service that will geocode an address, and (3) the Zomato web service that will find nearby restaurants.
+In figure 1 you can see the main architecture of our web service. Our web service will consist of three systems: (1) our foodie web service that will handle requests, (2) the Geocod.io web service that will geocode an address, and (3) the Yelp web service that will find nearby restaurants.
 
 
 \-\ \\
-The flow of handling a client request to our /restaurants endpoint can seen in figure 2. As you'll see, our client will send a request with an address to our web service. Our web service will then take that address, geocode that address by making a API call to Geocod.io, then find nearby restaurants by making a second API call to Zomato with our geocoded address. In this case, a client could be a web page, an app on a phone, or even another web service, but in this project we will only be focussing on the web service. You will not need to implement your own client. We will be using HTTP request tools to act as a client.  \\\\
+The flow of handling a client request to our /restaurants endpoint can seen in figure 2. As you'll see, our client will send a request with an address to our web service. Our web service will then take that address, geocode that address by making a API call to Geocod.io, then find nearby restaurants by making a second API call to Yelp with our geocoded address. In this case, a client could be a web page, an app on a phone, or even another web service, but in this project we will only be focussing on the web service. You will not need to implement your own client. We will be using HTTP request tools to act as a client.  \\\\
 
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{images/architecture}
+    \includegraphics[width=\linewidth]{images/architecture-2}
     \caption{Architecture of the Foodie Web Service}
 \end{figure}
 
 
 \begin{figure}[h!]
-    \includegraphics[width=\linewidth]{images/flowdiagram}
+    \includegraphics[width=\linewidth]{images/flowdiagram-2}
     \caption{Flow Diagram of the Foodie Web Service}
 \end{figure}
 
@@ -214,7 +215,7 @@ The Geocod.io is a web service that provides geocoding related services. It has 
 \textbf{Using the Geocod.io API}\\
 The /geocode endpoint is located at
 \begin{itemize}
-\item https://api.geocod.io/v1.3/geocode
+\item https://api.geocod.io/v1.6/geocode
 \end{itemize}
 A request to the /geocode endpoint requires two parameters:
 \begin{itemize}
@@ -234,7 +235,7 @@ The goal of this stage is to modify your web service to make a request to the Ge
 \textbf{Geocod.io Links:}
 \begin{itemize}
 \item  Learn more about the Geocod.io and get your API key - https://www.geocod.io/
-\item Learn more about the /geocode REST endpoint - https://www.geocod.io/docs/?shell\#geocoding
+\item Learn more about the /geocode REST endpoint - https://www.geocod.io/docs/\#geocoding
 \end{itemize}
 
 \begin{info}[Make sure to get your API key:]
@@ -252,47 +253,53 @@ The info that you'll need to store is within the body of the request stored in a
 %----------------------------------------------------------------------------------------
 
 \section{Finding Nearby Restaurants}
-\textbf{The Zomato API}\\
-Now that we have the latitude and longitude of our address, let's use the Zomato API to find some nearby restaurants. The Zomato has an REST endpoint /geocode, that takes a latitude and longitude parameters, an API key header, and returns a list of popular cuisines and nearby restaurants.
+\textbf{The Yelp Fusion API}\\
+Now that we have the latitude and longitude of our address, let's use the Yelp Fusion API to find some nearby businesses, but more specifically, restaurants. Yelp has an REST endpoint /businesses/search that takes latitude and longitude parameters, a category, an Authorization header (that takes your API key), and returns a list of nearby businesses matching the given category.
 
 \-\ \\
-\textbf{Using the Zomato API} \\
-The /geocode endpoint is located at
+\textbf{Using the Yelp API} \\
+The /businesses/search endpoint is located at
 \begin{itemize}
-\item https://developers.zomato.com/api/v2.1/geocode
+\item https://api.yelp.com/v3/businesses/search
 \end{itemize}
-A request to the /geocode endpoint requires three things:
+A request to the /geocode endpoint requires four things:
 \begin{itemize}
-\item lat - Latitude (as a request parameter)
-\item lon - Longitude (as a request parameter)
-\item user-key - Your Zomato API key (as a request header)
+\item latitude - Latitude (as a request parameter)
+\item longitude - Longitude (as a request parameter)
+\item categories - categories to search by (as a request parameter) (\textbf{Note: In this case you want to search the "Food" category to search for restaurants})
+\item "Authorization" HTTP header with value "Bearer <api key>" - header required to pass API key and authorize against Yelp web service
 \end{itemize}
-The /geocode endpoint returns:
+The  /businesses/search endpoint returns:
 \begin{itemize}
 \item A JSON response consisting of information on the location and a list of nearby restaurants.
 \end{itemize}
 
 \-\ \\
 \textbf{Stage Summary}\\
-The goal of this stage is the take the geocoded latitude and longitude you got from the Geocod.io API and make a request to the Zomato API and retrieve a list of nearby restaurants.
+The goal of this stage is the take the geocoded latitude and longitude you got from the Geocod.io API and make a request to the Yelp API and retrieve a list of nearby restaurants.
 
 \-\ \\
 \textbf{Make Note of Response Format}\\
-After you have successfully made your Zomato API call, look through the Zomato /geocode response. Take note of how nearby restaurants are formatted within the response. They should be listed under the key "nearby\_restaurants" which should be an JSON array of JSON objects, with each object representing a single restaurant nearby. You will need to pull certain values from each restaurant object and format it for the client in the next stage. 
+After you have successfully made your Yelp API call, look through the Yelp /businesses/search response. Take note of how nearby restaurants are formatted within the response. Listed under the key "businesses" should be an JSON array of JSON objects, with each object representing a single restaurant nearby. You will need to pull certain values from each restaurant object and format it for the client in the next stage. 
 
 \-\ \\
-\textbf{Zomato Links:}
+\textbf{Yelp Fusion API Links:}
 \begin{itemize}
-\item  Learn more about Zomato and get your API key - https://developers.zomato.com/api
-\item Learn more about the /geocode REST endpoint - https://developers.zomato.com/documentation
+\item Getting Started with the Yelp Fusions API - \\ \indent https://www.yelp.com/developers/documentation/v3/get\_started
+\item  Learn more about API Authorization and getting your API key - \\ \indent https://www.yelp.com/developers/documentation/v3/authentication
+\item Learn more about the /businesses/search REST endpoint - \\ \indent https://www.yelp.com/developers/documentation/v3/business\_search
 \end{itemize}
 
 \begin{info}[Make sure to get your API key:]
-To use the Zomato API you'll need to have an API key. You'll have to sign up for a free Zomato account, and generate an API key to use in your API requests. You can make up to 1,000 requests a day which should be sufficient enough for testing and implementing your project. 
+To use the Yelp API you'll need to have an API key. You'll have to sign up for a free Yelp account and create an app to generate an API key to use in your API requests. You can make up to 5,000 requests a day which should be sufficient enough for testing and implementing your project. 
+\end{info}
+
+\begin{info}[Do not use the location parameter in the Yelp API request:]
+Although, there is a location request parameter that you can use, which in this case, Yelps does the geocoding, do not use this. You should be using the latitude and longitude request parameters filled in with the latitude and longitude you got with Geocod.io.
 \end{info}
 
 \begin{info}[API Key Usage:]
-Using the API key for the Zomato API is different from how the API was used for the Geocod.io API. For Geocod.io, the API key was passed as a HTTP request parameter, but for the Zomato API, the api key is passed in as a HTTP request header. 
+Using the API key for the Yelp API is different from how the API was used for the Geocod.io API. For Geocod.io, the API key was passed as a HTTP request parameter, but for the Yelp API, the api key is passed in as a HTTP request header. 
 \end{info}
 
 
@@ -307,7 +314,6 @@ By now we should have a list of nearby restaurants, now we should take this and 
 \begin{itemize}
 \item name
 \item address
-\item cuisines
 \item rating
 \end{itemize}
 
@@ -324,13 +330,11 @@ The JSON body of your response back to the client should take the following form
         { 
                 "name" : "Restaurant 1",  
                 "address" : "1 Main St New Brunswick, 12345", 
-                "cuisines" : "Italian", 
                 "rating" : "3.5" 
         },
         { 
                 "name" : "Restaurant 2", 
                 "address" : "2 Main St New Brunswick  12345", 
-                "cuisines" : "Indian, Thai", 
                 "rating" : "3.7" 
         }
    ]
@@ -355,7 +359,7 @@ Another thing we should check for is if the client uses our web service incorrec
 What if some of the APIs we use are down? We should make sure that our Web Service doesn't break when the APIa we use are down. We can use the response codes we get from those requests to determine whether or not the service is down. Through experimenting and using the APIs you should notice that when an API call is successful, we get back a 200 status. So the idea is to make sure you check the statuses of the responses of the API calls. If the status codes is something other than 200, we should stop trying to further process the request and just return an appropriate error response back to our client. 
 
 \-\ \\
-\textbf{Responding Back Approriately}\\
+\textbf{Responding Back Appropriately}\\
 So we know to successfully catch these two errors, but when we respond with an error back to the client we should also send back an appropriate status code as well. Now remember HTTP response status codes are helpful to give the requester insight of what happened with their request. 4xx and 5xx level response codes are the two levels of response statuses used when something goes wrong. When the client sends a bad or malformed request, we typically use the 400 status which represents a Bad Request. When some operation within the service fails, we typically use the 500 status which represents an Internal Server Error. Let's use these two status codes for our edge cases.
 
 \-\ \\
@@ -367,7 +371,7 @@ In summary in this stage we want to
 \end{itemize}
 
 \begin{info}[Testing Fault Tolerance:]
-Test out you web service's fault tolterance by incorrectly formatting the request to one of the API calls to Geocod.io or Zomato so that the request fails. If you program is right, the client should receive and error. 
+Test out you web service's fault tolerance by incorrectly formatting the request to one of the API calls to Geocod.io or Yelp so that the request fails. If you program is right, the client should receive and error. 
 \end{info}
 
 \begin{info}[Only the status codes matter:]
@@ -383,18 +387,17 @@ You can format the error response back to the client any way you'd like as long 
 %----------------------------------------------------------------------------------------
 
 \section*{Submission } 
-To submit your project, have ONE of the group members submit two things:
+To submit your project, you must submit:
 
 \begin{enumerate}
 \item \textbf{A zip file of your project.} Remember to not include the downloaded libraries within the submission as it would be too large. Please list the libraries you used in the written submission so I can figure out which ones i'll need to instal in order to run your web service.
 \item \textbf{A pdf document consisting of the following things:}
 	\begin{itemize}
-	\item List of group members
 	\item A short paragraph or two describing what you accomplished.
 	\item A short paragraph or two describing any issues you may have encountered and how you think you could have solved them. If you didn't have any simply state that you didn't have any issues.
 	\item A short description on the libraries/packages you used
 	\item A short description on how to start your web service
-	\item A short description of where you placed your Geocod.io / Zomato API key within your code. (This way I can replace it with my own if I need to)
+	\item A short description of where you placed your Geocod.io / Yelp API key within your code. (This way I can replace it with my own if I need to)
 	\end{itemize}
 \end{enumerate}
 
@@ -441,7 +444,7 @@ To submit your project, have ONE of the group members submit two things:
 Follow online guides and tutorials on youtube to get the main idea of how to start building your web service and do other stuff.
 \end{info}
 \begin{info}[Test the API calls first:]
-Use curl/wget/postman to make API calls to Geocod.io and Zomato to sure you're formatting your API requests properly. 
+Use curl/wget/postman to make API calls to Geocod.io and Yelp to sure you're formatting your API requests properly. 
 \end{info}
 \begin{info}[When in Doubt, Google:]
 If you're having trouble figuring out something, Google it. Some other developer somewhere probably had the same issue as issue as you. There are plenty of guides you can look up to do all sorts of things! Look around and see what works for you!
@@ -453,7 +456,7 @@ If you're having trouble figuring out something, Google it. Some other developer
 %----------------------------------------------------------------------------------------
 
 \section*{Additional Questions} % Numbered section
-Don't be afraid to ask question, If you have any questions about the project or are having any issues, email me at \textbf{David.Domingo@rutgers.edu} or post your question to the Slack Channel!
+Don't be afraid to ask question, If you have any questions about the project or are having any issues, email me at \textbf{David.Domingo@rutgers.edu} or post your question to the Discussions thread on Canvas!
 
 %% File contents
 %\begin{file}[hello.py]
